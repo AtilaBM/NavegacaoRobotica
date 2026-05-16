@@ -16,8 +16,8 @@ typedef struct Posicao
 
 typedef struct Caminho
 {
-    Posicao *Inicio;     // Ponteiro para a primeira posição ocupada pelo robô 
-    Posicao * Fim; // Ponteiro para a última posição ocupada pelo robô
+    Posicao *Inicio;     // Ponteiro para a primeira posição ocupada pelo robô
+    Posicao *Fim;        // Ponteiro para a última posição ocupada pelo robô
     Posicao *Historico;  // Ponteiro para o histórico de posições ocupadas pelo robô
     Comando *Instrucoes; // Ponteiro para a 1ª das instruções a serem executadas
     int N;               // Quantidade de instruções executadas no trajeto

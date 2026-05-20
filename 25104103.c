@@ -9,26 +9,26 @@ Caminho *InicializarCaminho(const char *Sequencia, int xInicial, int yInicial)
     if (c == NULL)
         return NULL;
 
-    Posicao *novP = (Posicao *)malloc(sizeof(Posicao));
-    if (novP == NULL)
+    Posicao *novaP = (Posicao *)malloc(sizeof(Posicao));
+    if (novaP == NULL)
     {
         free(c);
         return NULL;
     }
 
-    novP->X = xInicial;
-    novP->Y = yInicial;
-    novP->Proximo = NULL;
+    novaP->X = xInicial;
+    novaP->Y = yInicial;
+    novaP->Proximo = NULL;
 
     Posicao *novoH = (Posicao *)malloc(sizeof(Posicao));
     if (novoH == NULL)
     {
-        free(novP);
+        free(novaP);
         free(c);
         return NULL;
     }
 
-    c->Inicio = novP;
+    c->Inicio = novaP;
     c->Historico = novoH;
     c->Historico->X = xInicial;
     c->Historico->Y = yInicial;

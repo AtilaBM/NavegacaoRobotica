@@ -1,170 +1,199 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
 #include "caminho.h"
 
-int erros = 0;
+int pontos = 0;
+int total = 0;
 
-void AssertInt(const char *teste, int esperado, int obtido)
+void teste(const char *descricao, int passou)
 {
-    if (esperado == obtido)
-        printf("[OK] %s\n", teste);
-    else
+    total++;
+    if (passou)
     {
-        printf("[ERRO] %s | esperado=%d obtido=%d\n",
-               teste, esperado, obtido);
-        erros++;
+        pontos++;
+        printf("[OK] %s\n", descricao);
     }
-}
-
-void AssertDouble(const char *teste, double esperado, double obtido)
-{
-    double diff = fabs(esperado - obtido);
-
-    if (diff < 0.01)
-        printf("[OK] %s\n", teste);
     else
-    {
-        printf("[ERRO] %s | esperado=%.2f obtido=%.2f\n",
-               teste, esperado, obtido);
-        erros++;
-    }
-}
-
-void AssertPtr(const char *teste, void *ptr)
-{
-    if (ptr != NULL)
-        printf("[OK] %s\n", teste);
-    else
-    {
-        printf("[ERRO] %s | ponteiro NULL\n", teste);
-        erros++;
-    }
-}
-
-void AssertNull(const char *teste, void *ptr)
-{
-    if (ptr == NULL)
-        printf("[OK] %s\n", teste);
-    else
-    {
-        printf("[ERRO] %s | esperado NULL\n", teste);
-        erros++;
-    }
+        printf("[FALHOU] %s\n", descricao);
 }
 
 int main()
 {
-    Caminho *C;
-    Posicao *P;
+    printf("=== TESTES AUTOMATICOS ===\n\n");
 
-    printf("======== TESTE 1 ========\n");
+    // -------------------------
+    // InicializarCaminho
+    // -------------------------
+    printf("--- InicializarCaminho ---\n");
 
-    C = InicializarCaminho("LLLLLLLNNNNN", 2, 2);
+    Caminho *c1 = InicializarCaminho("LLLLLLLNNNNN", 2, 2);
+    teste("Sequencia valida retorna nao NULL", c1 != NULL);
 
-    AssertPtr("InicializarCaminho", C);
-
-    if (C != NULL)
+    if (c1 != NULL)
     {
-        P = DeterminarFim(C);
-
-        AssertPtr("DeterminarFim", P);
-
-        if (P != NULL)
-        {
-            AssertInt("Fim X", 9, P->X);
-            AssertInt("Fim Y", 7, P->Y);
-        }
-
-        AssertInt("Distancia Total",
-                  12,
-                  CalcularDistanciaTotal(C));
-
-        AssertDouble("Distancia Geometrica",
-                     8.60,
-                     CalcularDistanciaGeometrica(C));
-
-        AssertInt("Distancia Manhattan",
-                  12,
-                  CalcularDistanciaManhattan(C));
-
-        AssertInt("ContarInstrucoes",
-                  12,
-                  ContarInstrucoes(C));
-
-        DestruirCaminho(C);
+        teste("Inicio X correto", c1->Inicio->X == 2);
+        teste("Inicio Y correto", c1->Inicio->Y == 2);
+        teste("N correto (12)", c1->N == 12);
+        teste("Fim X correto (9)", c1->Fim->X == 9);
+        teste("Fim Y correto (7)", c1->Fim->Y == 7);
+        teste("Historico nao NULL", c1->Historico != NULL);
+        teste("Historico inicio X correto", c1->Historico->X == 2);
+        teste("Historico inicio Y correto", c1->Historico->Y == 2);
+        teste("Instrucoes nao NULL", c1->Instrucoes != NULL);
+        teste("Primeira instrucao L", c1->Instrucoes->Direcao == 'L');
+        DestruirCaminho(c1);
     }
 
-    printf("\n======== TESTE 2 ========\n");
+    Caminho *c2 = InicializarCaminho("NNNXLLL", 0, 0);
+    teste("Comando invalido retorna NULL", c2 == NULL);
 
-    C = InicializarCaminho("NNXLL", 0, 0);
+    Caminho *c3 = InicializarCaminho(NULL, 0, 0);
+    teste("Sequencia NULL retorna NULL", c3 == NULL);
 
-    AssertNull("Comando invalido", C);
-
-    printf("\n======== TESTE 3 ========\n");
-
-    C = InicializarCaminho(NULL, 0, 0);
-
-    AssertNull("Sequencia NULL", C);
-
-    printf("\n======== TESTE 4 ========\n");
-
-    AssertNull("DeterminarFim(NULL)",
-               DeterminarFim(NULL));
-
-    AssertNull("HistoricoPosicoes(NULL)",
-               HistoricoPosicoes(NULL));
-
-    AssertInt("CalcularDistanciaTotal(NULL)",
-              -1,
-              CalcularDistanciaTotal(NULL));
-
-    AssertDouble("CalcularDistanciaGeometrica(NULL)",
-                 -1.0,
-                 CalcularDistanciaGeometrica(NULL));
-
-    AssertInt("CalcularDistanciaManhattan(NULL)",
-              -1,
-              CalcularDistanciaManhattan(NULL));
-
-    AssertInt("ContarInstrucoes(NULL)",
-              -1,
-              ContarInstrucoes(NULL));
-
-    printf("\n======== TESTE 5 ========\n");
-
-    C = InicializarCaminho("", 5, 5);
-
-    AssertPtr("Sequencia vazia", C);
-
-    if (C != NULL)
+    Caminho *c4 = InicializarCaminho("", 5, 5);
+    teste("Sequencia vazia retorna nao NULL", c4 != NULL);
+    if (c4 != NULL)
     {
-        P = DeterminarFim(C);
-
-        if (P == NULL)
-            printf("[INFO] Fim ficou NULL na sequencia vazia\n");
-
-        printf("Distancia total: %d\n",
-               CalcularDistanciaTotal(C));
-
-        printf("Distancia geometrica: %.2f\n",
-               CalcularDistanciaGeometrica(C));
-
-        printf("Distancia Manhattan: %d\n",
-               CalcularDistanciaManhattan(C));
-
-        printf("Instrucoes: %d\n",
-               ContarInstrucoes(C));
-
-        DestruirCaminho(C);
+        teste("Sequencia vazia N = 0", c4->N == 0);
+        teste("Sequencia vazia Fim = NULL", c4->Fim == NULL);
+        teste("Sequencia vazia Inicio X correto", c4->Inicio->X == 5);
+        DestruirCaminho(c4);
     }
 
-    printf("\n=========================\n");
+    Caminho *c5 = InicializarCaminho("NSLO", 0, 0);
+    teste("Sequencia NSLO retorna nao NULL", c5 != NULL);
+    if (c5 != NULL)
+    {
+        teste("NSLO posicao final X = 0", c5->Fim->X == 0);
+        teste("NSLO posicao final Y = 0", c5->Fim->Y == 0);
+        DestruirCaminho(c5);
+    }
 
-    if (erros == 0)
-        printf("TODOS OS TESTES PASSARAM\n");
-    else
-        printf("TOTAL DE ERROS: %d\n", erros);
+    // -------------------------
+    // DeterminarFim
+    // -------------------------
+    printf("\n--- DeterminarFim ---\n");
 
-    return erros;
+    Caminho *cf = InicializarCaminho("LLLLLLLNNNNN", 2, 2);
+    if (cf != NULL)
+    {
+        Posicao *fim = DeterminarFim(cf);
+        teste("DeterminarFim nao NULL", fim != NULL);
+        teste("DeterminarFim X = 9", fim != NULL && fim->X == 9);
+        teste("DeterminarFim Y = 7", fim != NULL && fim->Y == 7);
+        DestruirCaminho(cf);
+    }
+    teste("DeterminarFim com NULL retorna NULL", DeterminarFim(NULL) == NULL);
+
+    // -------------------------
+    // HistoricoPosicoes
+    // -------------------------
+    printf("\n--- HistoricoPosicoes ---\n");
+
+    Caminho *ch = InicializarCaminho("LN", 0, 0);
+    if (ch != NULL)
+    {
+        Posicao *h = HistoricoPosicoes(ch);
+        teste("Historico nao NULL", h != NULL);
+        teste("Historico primeiro ponto X = 0", h != NULL && h->X == 0);
+        teste("Historico primeiro ponto Y = 0", h != NULL && h->Y == 0);
+        if (h && h->Proximo)
+            teste("Historico segundo ponto X = 1", h->Proximo->X == 1);
+        if (h && h->Proximo && h->Proximo->Proximo)
+            teste("Historico terceiro ponto Y = 1", h->Proximo->Proximo->Y == 1);
+        DestruirCaminho(ch);
+    }
+    teste("HistoricoPosicoes com NULL retorna NULL", HistoricoPosicoes(NULL) == NULL);
+
+    // -------------------------
+    // CalcularDistanciaTotal
+    // -------------------------
+    printf("\n--- CalcularDistanciaTotal ---\n");
+
+    Caminho *ct = InicializarCaminho("LLLLLLLNNNNN", 2, 2);
+    if (ct != NULL)
+    {
+        teste("DistanciaTotal = 12", CalcularDistanciaTotal(ct) == 12);
+        DestruirCaminho(ct);
+    }
+    Caminho *ct2 = InicializarCaminho("", 0, 0);
+    if (ct2 != NULL)
+    {
+        teste("DistanciaTotal vazia = 0", CalcularDistanciaTotal(ct2) == 0);
+        DestruirCaminho(ct2);
+    }
+    teste("DistanciaTotal com NULL retorna -1", CalcularDistanciaTotal(NULL) == -1);
+
+    // -------------------------
+    // CalcularDistanciaGeometrica
+    // -------------------------
+    printf("\n--- CalcularDistanciaGeometrica ---\n");
+
+    Caminho *cg = InicializarCaminho("LLLLLLLNNNNN", 2, 2);
+    if (cg != NULL)
+    {
+        double geo = CalcularDistanciaGeometrica(cg);
+        teste("DistanciaGeometrica ~8.60", geo > 8.60 && geo < 8.61);
+        DestruirCaminho(cg);
+    }
+    Caminho *cg2 = InicializarCaminho("", 0, 0);
+    if (cg2 != NULL)
+    {
+        teste("DistanciaGeometrica vazia = -1.0", CalcularDistanciaGeometrica(cg2) == -1.0);
+        DestruirCaminho(cg2);
+    }
+    teste("DistanciaGeometrica com NULL retorna -1.0", CalcularDistanciaGeometrica(NULL) == -1.0);
+
+    // -------------------------
+    // CalcularDistanciaManhattan
+    // -------------------------
+    printf("\n--- CalcularDistanciaManhattan ---\n");
+
+    Caminho *cm = InicializarCaminho("LLLLLLLNNNNN", 2, 2);
+    if (cm != NULL)
+    {
+        teste("Manhattan = 12", CalcularDistanciaManhattan(cm) == 12);
+        DestruirCaminho(cm);
+    }
+    Caminho *cm2 = InicializarCaminho("NNNNOOOOLLLSS", 0, 0);
+    if (cm2 != NULL)
+    {
+        teste("Manhattan NNNNOOOOLLLSS = 3", CalcularDistanciaManhattan(cm2) == 3);
+        DestruirCaminho(cm2);
+    }
+    Caminho *cm3 = InicializarCaminho("", 0, 0);
+    if (cm3 != NULL)
+    {
+        teste("Manhattan vazia = -1", CalcularDistanciaManhattan(cm3) == -1);
+        DestruirCaminho(cm3);
+    }
+    teste("Manhattan com NULL retorna -1", CalcularDistanciaManhattan(NULL) == -1);
+
+    // -------------------------
+    // ContarInstrucoes
+    // -------------------------
+    printf("\n--- ContarInstrucoes ---\n");
+
+    Caminho *ci = InicializarCaminho("LLLLLLLNNNNN", 2, 2);
+    if (ci != NULL)
+    {
+        teste("ContarInstrucoes = 12", ContarInstrucoes(ci) == 12);
+        DestruirCaminho(ci);
+    }
+    Caminho *ci2 = InicializarCaminho("", 0, 0);
+    if (ci2 != NULL)
+    {
+        teste("ContarInstrucoes vazia = 0", ContarInstrucoes(ci2) == 0);
+        DestruirCaminho(ci2);
+    }
+    teste("ContarInstrucoes com NULL retorna -1", ContarInstrucoes(NULL) == -1);
+
+    // -------------------------
+    // Resultado
+    // -------------------------
+    printf("\n=== RESULTADO ===\n");
+    printf("Testes passados: %d / %d\n", pontos, total);
+    printf("Nota estimada: %.2f\n", (double)pontos / total);
+
+    return 0;
 }
